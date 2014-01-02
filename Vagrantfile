@@ -11,6 +11,8 @@ Vagrant.configure("2") do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "Berkshelf-CentOS-6.3-x86_64-minimal"
 
+  config.vm.network :forwarded_port, guest: 3000, host: 8080
+
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
   #config.vm.box_url = "https://dl.dropbox.com/u/31081437/Berkshelf-CentOS-6.3-x86_64-minimal.box"
@@ -54,13 +56,16 @@ Vagrant.configure("2") do |config|
 
   # config.ssh.max_tries = 40
   # config.ssh.timeout   = 120
+  # config.ssh.forward_agent = true
+  # config.ssh.private_key_path = "~/.ssh/id_rsa"
 
   # The path to the Berksfile to use with Vagrant Berkshelf
-  # config.berkshelf.berksfile_path = "./Berksfile"
+  config.berkshelf.berksfile_path = "./Berksfile"
 
   # Enabling the Berkshelf plugin. To enable this globally, add this configuration
   # option to your ~/.vagrant.d/Vagrantfile file
   config.berkshelf.enabled = true
+
 
   # An array of symbols representing groups of cookbook described in the Vagrantfile
   # to exclusively install and copy to Vagrant's shelf.
@@ -71,6 +76,9 @@ Vagrant.configure("2") do |config|
   # config.berkshelf.except = []
 
   config.vm.provision :chef_solo do |chef|
+    chef.add_recipe "yum"
+    chef.add_recipe "yum-epel"
+    chef.cookbooks_path = ["cookbooks"]
     chef.json = {
       :mysql => {
         :server_root_password => 'rootpass',
